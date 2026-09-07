@@ -1,0 +1,29 @@
+{
+  "name": "noviciado-the-garden",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The Garden — a private daily digital ritual by Noviciado.",
+  "scripts": {
+    "dev": "vite --port 4173",
+    "start": "vite --port 4173",
+    "build": "vite build",
+    "preview": "vite preview --port 4173",
+    "test": "node --test",
+    "check": "vite build"
+  },
+  "dependencies": {
+    "@react-three/fiber": "^9.7.0",
+    "@solana/wallet-adapter-base": "^0.9.27",
+    "@solana/wallet-adapter-react": "^0.15.39",
+    "@solana/wallet-adapter-react-ui": "^0.9.39",
+    "@solana/web3.js": "^1.98.4",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "three": "^0.185.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.0.4",
+    "vite": "^7.1.5"
+  }
+}

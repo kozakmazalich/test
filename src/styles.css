@@ -1,0 +1,811 @@
+:root {
+  color-scheme: dark;
+  --noir: #060605;
+  --noir-2: #0d0c0a;
+  --panel: #111009;
+  --panel-border: rgba(201, 164, 92, 0.22);
+  --ivory: #ece6d8;
+  --muted: #8f8676;
+  --gold: #cfa356;
+  --gold-soft: #e8cf9a;
+  --champagne: #f3e2b8;
+  --bronze: #6b4a26;
+  --smoke: rgba(20, 18, 14, 0.72);
+  --danger: #d98a6b;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--noir);
+  color: var(--ivory);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+p {
+  margin: 0;
+}
+
+.uppercase-label {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+/* ---------- Shared buttons ---------- */
+
+.primary-button {
+  border: 1px solid var(--gold);
+  background: transparent;
+  color: var(--champagne);
+  padding: 0.95rem 2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background 220ms ease, color 220ms ease, box-shadow 220ms ease;
+}
+
+.primary-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(207, 163, 86, 0.18), rgba(232, 207, 154, 0.08));
+  box-shadow: 0 0 24px rgba(207, 163, 86, 0.22);
+}
+
+.icon-toggle {
+  border: 1px solid rgba(201, 164, 92, 0.3);
+  background: transparent;
+  color: var(--muted);
+  padding: 0.55rem 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.66rem;
+  cursor: pointer;
+  transition: color 180ms ease, border-color 180ms ease;
+}
+
+.icon-toggle:hover,
+.icon-toggle[aria-pressed="true"] {
+  color: var(--champagne);
+  border-color: var(--gold);
+}
+
+.dev-button {
+  align-self: center;
+  margin-top: 1.5rem;
+  border: 1px dashed rgba(217, 138, 107, 0.6);
+  background: transparent;
+  color: var(--danger);
+  padding: 0.5rem 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.66rem;
+  cursor: pointer;
+}
+
+/* ---------- Entry screen ---------- */
+
+.entry-screen {
+  min-height: 100vh;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.9rem;
+  text-align: center;
+  padding: 2rem 1.5rem;
+  background: radial-gradient(circle at 50% 38%, #14120c 0%, var(--noir) 70%);
+}
+
+/*
+ * The member avatar (real photo or 3D fallback) and the golden plant
+ * together, replacing the old CSS rotating-facet placeholder. See
+ * EntryScreen.jsx for composition.
+ */
+.entry-scene {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 0.6rem;
+}
+
+.entry-plant {
+  position: relative;
+  width: 190px;
+  height: 220px;
+}
+
+.entry-kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.entry-title {
+  margin: 0;
+  font-size: clamp(2rem, 6vw, 3.2rem);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--champagne);
+  font-weight: 500;
+}
+
+.entry-subtitle {
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.entry-cta {
+  margin-top: 1.4rem;
+}
+
+.entry-footnote {
+  margin-top: 2rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* ---------- Wallet adapter modal overrides ---------- */
+
+.wallet-adapter-modal-wrapper {
+  background: var(--panel) !important;
+  border: 1px solid var(--panel-border) !important;
+  font-family: inherit !important;
+}
+
+.wallet-adapter-modal-title {
+  color: var(--champagne) !important;
+}
+
+.wallet-adapter-modal-list .wallet-adapter-button {
+  background: transparent !important;
+  border: 1px solid rgba(201, 164, 92, 0.2) !important;
+  color: var(--ivory) !important;
+}
+
+.wallet-adapter-button-trigger {
+  background: var(--gold) !important;
+}
+
+/* ---------- Loading / generating states ---------- */
+
+.loading-state {
+  min-height: 100vh;
+  display: grid;
+  place-content: center;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.avatar-sequence {
+  min-height: 100vh;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 1.4rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.sequence-kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.assembly-stage {
+  min-height: 220px;
+  display: grid;
+  place-content: center;
+}
+
+.assembly-fragments {
+  position: relative;
+  width: 160px;
+  height: 160px;
+}
+
+.fragment {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, var(--gold-soft), var(--bronze));
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  top: 50%;
+  left: 50%;
+  animation: fragment-assemble 1.6s ease-out infinite;
+}
+
+.fragment:nth-child(1) { --tx: -70px; --ty: -60px; }
+.fragment:nth-child(2) { --tx: 70px; --ty: -60px; }
+.fragment:nth-child(3) { --tx: -80px; --ty: 40px; }
+.fragment:nth-child(4) { --tx: 80px; --ty: 40px; }
+.fragment:nth-child(5) { --tx: 0px; --ty: -90px; }
+.fragment:nth-child(6) { --tx: 0px; --ty: 70px; }
+
+.sequence-ready {
+  display: grid;
+  gap: 0.6rem;
+  justify-items: center;
+}
+
+.sequence-garden {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--champagne);
+  font-size: 0.85rem;
+}
+
+.sequence-subtitle {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  font-size: 0.72rem;
+  margin-bottom: 0.6rem;
+}
+
+/* ---------- Main app shell ---------- */
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: min(1180px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 1.4rem 0 3rem;
+  gap: 1.6rem;
+}
+
+.app-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.brand-kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+
+.brand-title {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 1rem;
+  color: var(--champagne);
+  margin-top: 0.2rem;
+}
+
+.header-controls {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+/* ---------- Garden stage ---------- */
+
+.garden-stage {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: center;
+  min-height: 280px;
+}
+
+.garden-column {
+  display: grid;
+  place-content: center;
+}
+
+/*
+ * The member avatar: an image-first "premium frame" that displays the
+ * real reference photo exactly as provided (drop it at
+ * public/avatar-helmet.png), falling back to a 3D reconstruction
+ * (src/three/HelmetMesh.jsx) only if that file is missing. A gold
+ * neon radial day-progress ring (DayHalo) overlays the frame's center
+ * regardless of which is showing beneath it. The golden plant is a
+ * real WebGL scene (src/three/PottedWeed.jsx and GoldenBloom.jsx).
+ */
+.garden-avatar {
+  position: relative;
+  display: grid;
+  place-content: center;
+  overflow: hidden;
+}
+
+.avatar-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: 3px solid var(--gold);
+  border-radius: 20px;
+  background: #000;
+  overflow: hidden;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+}
+
+.avatar-frame-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.day-halo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.day-halo-segment {
+  stroke: rgba(201, 164, 92, 0.28);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  transition: stroke 260ms ease, filter 260ms ease;
+}
+
+.day-halo-segment.is-complete {
+  stroke: var(--gold-soft);
+  filter: drop-shadow(0 0 3px rgba(232, 207, 154, 0.85));
+}
+
+.day-halo-segment.is-charging {
+  stroke: #fff3d0;
+  filter: drop-shadow(0 0 6px rgba(255, 243, 208, 0.95));
+  animation: day-halo-charge 1.2s ease-out;
+}
+
+.garden-avatar-large {
+  width: 210px;
+  height: 260px;
+}
+
+.garden-avatar-medium {
+  width: 150px;
+  height: 190px;
+}
+
+.garden-avatar-small {
+  width: 110px;
+  height: 140px;
+  margin: 0 auto 1rem;
+}
+
+.garden-plant {
+  position: relative;
+  width: 240px;
+  height: 300px;
+  display: grid;
+  place-content: center;
+  overflow: hidden;
+  transition: filter 600ms ease;
+}
+
+.garden-plant.is-final-form {
+  filter: drop-shadow(0 0 26px rgba(232, 207, 154, 0.35));
+}
+
+/* ---------- Ritual panel ---------- */
+
+.ritual-panel {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  text-align: center;
+  padding: 1.6rem 1rem 2rem;
+  border-top: 1px solid var(--panel-border);
+}
+
+.ritual-day-label {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--champagne);
+  font-size: 0.9rem;
+}
+
+.ritual-status {
+  color: var(--muted);
+  font-size: 0.92rem;
+  max-width: 42ch;
+}
+
+.ritual-cta {
+  margin-top: 0.4rem;
+}
+
+.ritual-cooldown {
+  display: grid;
+  gap: 0.3rem;
+  justify-items: center;
+}
+
+.ritual-cooldown-title {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--gold-soft);
+  font-size: 0.85rem;
+}
+
+.ritual-cooldown-caption {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--muted);
+  font-size: 0.66rem;
+}
+
+.ritual-cooldown-timer {
+  font-size: 1.4rem;
+  letter-spacing: 0.06em;
+  color: var(--champagne);
+  font-variant-numeric: tabular-nums;
+}
+
+.ritual-countdown-label {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+/* ---------- Day progress ---------- */
+
+.day-progress {
+  display: flex;
+  gap: 0.7rem;
+  margin-top: 0.4rem;
+}
+
+.day-mark {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+}
+
+.day-mark-shape {
+  width: 14px;
+  height: 14px;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  background: rgba(201, 164, 92, 0.16);
+  border: 1px solid rgba(201, 164, 92, 0.28);
+  transition: background 220ms ease, box-shadow 220ms ease;
+}
+
+.day-mark.is-complete .day-mark-shape {
+  background: linear-gradient(135deg, var(--champagne), var(--gold));
+  border-color: var(--gold);
+  box-shadow: 0 0 10px rgba(207, 163, 86, 0.5);
+}
+
+.day-mark.is-current .day-mark-shape {
+  border-color: var(--gold-soft);
+  transform: scale(1.25);
+}
+
+.day-mark-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.day-mark.is-complete .day-mark-label {
+  color: var(--champagne);
+}
+
+/* ---------- Watering overlay ---------- */
+
+.watering-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 3, 2, 0.88);
+  display: grid;
+  place-content: center;
+  gap: 1.4rem;
+  justify-items: center;
+  z-index: 40;
+}
+
+.overlay-skip {
+  position: absolute;
+  top: 1.4rem;
+  right: 1.4rem;
+  background: transparent;
+  border: 1px solid rgba(201, 164, 92, 0.3);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.68rem;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+}
+
+/*
+ * The watering reaction — light entering the pot, the weed physically
+ * responding, metallic light traveling through the blades, rising
+ * particles — is a real WebGL scene (src/three/WateringScene.jsx),
+ * not CSS keyframes.
+ */
+.watering-canvas {
+  position: relative;
+  width: min(280px, 78vw);
+  height: 320px;
+}
+
+.watering-result {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+}
+
+.result-title {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--champagne);
+  font-size: 1rem;
+}
+
+/* ---------- Reward sequence ---------- */
+
+.reward-sequence {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 2, 2, 0.94);
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 1.2rem;
+  padding: 2rem;
+  text-align: center;
+  z-index: 50;
+}
+
+.reward-kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.reward-title {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--champagne);
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 500;
+}
+
+/*
+ * Real 3D gold coins/tokens (thickness, beveled rim, metallic PBR
+ * material, the emblem texture-mapped onto each face) rendered via
+ * src/three/RewardCoinsScene.jsx — not flat 2D coin icons.
+ */
+.coin-canvas {
+  position: relative;
+  width: min(560px, 92vw);
+  height: 280px;
+}
+
+.reward-claimed {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: center;
+  margin-top: 0.6rem;
+}
+
+.reward-plus {
+  font-size: 2.4rem;
+  color: var(--champagne);
+  font-weight: 500;
+}
+
+.reward-label {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--gold-soft);
+  font-size: 0.8rem;
+}
+
+.reward-balance {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  font-size: 0.78rem;
+  margin-bottom: 0.6rem;
+}
+
+/* ---------- Profile card ---------- */
+
+.profile-card {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 2, 2, 0.82);
+  display: grid;
+  place-content: center;
+  z-index: 60;
+}
+
+.profile-card::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+}
+
+.profile-card {
+  padding: 2rem 2.4rem;
+}
+
+.profile-close {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.4rem;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 1.4rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.profile-kicker {
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  font-size: 0.7rem;
+  margin-bottom: 1rem;
+}
+
+.profile-details {
+  display: grid;
+  gap: 0.8rem;
+  min-width: 260px;
+  margin: 1.2rem 0 0;
+}
+
+.profile-details > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(201, 164, 92, 0.14);
+  padding-bottom: 0.5rem;
+}
+
+.profile-details dt {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.profile-details dd {
+  margin: 0;
+  color: var(--champagne);
+  font-size: 0.85rem;
+}
+
+.footer-note {
+  margin-top: auto;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+/* ---------- Keyframes ---------- */
+
+@keyframes fragment-assemble {
+  0% { transform: translate(calc(var(--tx) * 1.6), calc(var(--ty) * 1.6)) scale(0.4) rotate(120deg); opacity: 0; }
+  60% { opacity: 1; }
+  100% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes day-halo-charge {
+  0% { stroke-width: 2.6; opacity: 0.6; }
+  40% { stroke-width: 4.2; opacity: 1; }
+  100% { stroke-width: 2.6; opacity: 1; }
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .fragment {
+    animation: none !important;
+  }
+}
+
+.app[data-reduced-motion="true"] .fragment {
+  animation: none !important;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 860px) {
+  .garden-stage {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .garden-avatar-large {
+    width: 160px;
+    height: 200px;
+  }
+
+  .garden-plant {
+    width: 200px;
+    height: 250px;
+  }
+
+  .entry-scene {
+    flex-direction: column;
+  }
+
+  .entry-plant {
+    width: 160px;
+    height: 190px;
+  }
+
+  .day-progress {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .app {
+    width: min(100% - 1rem, 1180px);
+  }
+
+  .header-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .profile-card {
+    padding: 1.5rem;
+  }
+
+  .watering-canvas {
+    height: 280px;
+  }
+
+  .coin-canvas {
+    height: 240px;
+  }
+}
