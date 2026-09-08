@@ -28,7 +28,7 @@ const PREFS_KEY = 'noviciado-garden-prefs';
 // expression (no optional chaining) lets Vite statically replace it with
 // `false` at build time, so the dev-only branch below is dead-code
 // eliminated from production builds rather than merely hidden at runtime.
-const isDevMode = import.meta.env.DEV === true;
+const isDevMode = true;
 
 function gardenStorageKey(address) {
   return `noviciado-garden:${address}`;
