@@ -28,7 +28,7 @@ export function WateringOverlay({ onComplete, reducedMotion, fromStage = 0, toSt
         <Canvas
           shadows
           dpr={[1, 2]}
-          camera={{ position: [0, 0.3, 4.4], fov: 36 }}
+          camera={{ position: [0, 0.5, 5.8], fov: 38 }}
           gl={{ alpha: true, antialias: true }}
         >
           <WateringScene fromStage={fromStage} toStage={toStage} phase={phase} reducedMotion={reducedMotion} />

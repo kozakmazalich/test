@@ -33,11 +33,11 @@ export function GardenAvatar({
           <Canvas
             shadows
             dpr={[1, 2]}
-            camera={{ position: [0, 0.15, 3.4], fov: 32 }}
+            camera={{ position: [0, 0.05, 4.4], fov: 32 }}
             gl={{ alpha: true, antialias: true }}
           >
             <StudioEnvironment />
-            <HelmetMesh reducedMotion={reducedMotion} floatEnabled />
+            <HelmetMesh reducedMotion={reducedMotion} floatEnabled scanPulse={scanPulse} />
           </Canvas>
         ) : (
           <img

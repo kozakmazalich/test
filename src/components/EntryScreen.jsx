@@ -16,7 +16,7 @@ function EntryPlant() {
       <Canvas
         shadows
         dpr={[1, 2]}
-        camera={{ position: [0.4, 0.25, 5.2], fov: 30 }}
+        camera={{ position: [0, 0.5, 5.8], fov: 38 }}
         gl={{ alpha: true, antialias: true }}
       >
         <StudioEnvironment />

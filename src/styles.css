@@ -412,7 +412,7 @@ p {
   height: 300px;
   display: grid;
   place-content: center;
-  overflow: hidden;
+  overflow: visible;
   transition: filter 600ms ease;
 }
 
@@ -583,7 +583,7 @@ p {
 .reward-sequence {
   position: fixed;
   inset: 0;
-  background: rgba(2, 2, 2, 0.94);
+  background: #020202;
   display: grid;
   place-content: center;
   justify-items: center;

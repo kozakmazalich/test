@@ -86,7 +86,7 @@ export function CoinMesh({ position = [0, 0, 0], spin = true, revealDelay = 0, e
   return (
     <group ref={groupRef} visible={false}>
       {/* Side wall — genuine thickness, open-ended so it doesn't add its own caps */}
-      <mesh castShadow>
+      <mesh castShadow rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[COIN_RADIUS, COIN_RADIUS, COIN_THICKNESS, 64, 1, true]} />
         <meshPhysicalMaterial color="#cfa356" metalness={1} roughness={0.22} envMapIntensity={1.6} />
       </mesh>

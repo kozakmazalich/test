@@ -3,61 +3,16 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { createTaperedTubeGeometry, quaternionFromDirection } from './geometryUtils.js';
 
-/**
- * An original golden plant sculpture — NOT a recreation of the
- * reference leaf image. The reference informs material/style only
- * (metallic gold, faceted, premium). The structure here is organic:
- * curved tapering stems that lengthen day by day, small unfurling
- * leaves, and a flower head that buds and blooms across the final
- * days, rather than a static shape that merely scales or fades in.
- */
-const STEMS = [
-  {
-    id: 'main',
-    startStage: 1,
-    growSpan: 3,
-    points: [[0, 0, 0], [0.04, 0.55, 0.04], [0.12, 1.05, -0.04], [0.08, 1.55, 0.08]],
-    radiusStart: 0.045,
-    radiusEnd: 0.014,
-    hasBloom: true,
-    bloomFromStage: 5,
-  },
-  {
-    id: 'left',
-    startStage: 2,
-    growSpan: 3,
-    points: [[0, 0, 0], [-0.22, 0.32, 0.08], [-0.48, 0.68, 0.14], [-0.58, 0.98, 0.05]],
-    radiusStart: 0.032,
-    radiusEnd: 0.01,
-    leafAt: [0.5, 0.88],
-  },
-  {
-    id: 'right',
-    startStage: 3,
-    growSpan: 3,
-    points: [[0, 0, 0], [0.26, 0.28, -0.1], [0.5, 0.62, -0.18], [0.6, 0.9, -0.1]],
-    radiusStart: 0.03,
-    radiusEnd: 0.01,
-    leafAt: [0.55, 0.92],
-  },
-];
-
-function targetGrowth(stage, stem) {
-  if (stage < stem.startStage) {
-    return stem.id === 'main' ? 0.06 : 0;
-  }
-
-  const progress = Math.min(1, (stage - stem.startStage + 1) / stem.growSpan);
-  return Math.max(0.08, progress);
+function targetGrowth(stage) {
+  if (stage <= 0) return 0.05;
+  const progress = stage / 7;
+  return Math.max(0.05, progress);
 }
 
-function targetBloom(stage, stem) {
-  if (!stem.hasBloom || stage < stem.bloomFromStage) {
-    return 0;
-  }
-
-  const span = 7 - stem.bloomFromStage + 1;
-  return Math.min(1, (stage - stem.bloomFromStage + 1) / span);
+function targetBloom(stage) {
+  if (stage < 6) return 0;
+  if (stage === 6) return 0.4;
+  return 1;
 }
 
 function createLeafShape() {
@@ -71,16 +26,64 @@ function createLeafShape() {
   return shape;
 }
 
-function createPetalShape() {
-  const shape = new THREE.Shape();
-  shape.moveTo(0, 0);
-  shape.quadraticCurveTo(0.16, 0.24, 0.11, 0.52);
-  shape.quadraticCurveTo(0.05, 0.74, 0, 0.82);
-  shape.quadraticCurveTo(-0.05, 0.74, -0.11, 0.52);
-  shape.quadraticCurveTo(-0.16, 0.24, 0, 0);
-  shape.closePath();
-  return shape;
+function createFacetedBladeGeometry(length, width, thickness) {
+  const geom = new THREE.BufferGeometry();
+  const vertices = new Float32Array([
+    // Front top left
+    0, length, 0,
+    -width / 2, length * 0.35, 0,
+    0, length * 0.35, thickness,
+
+    // Front top right
+    0, length, 0,
+    0, length * 0.35, thickness,
+    width / 2, length * 0.35, 0,
+
+    // Front bottom left
+    0, length * 0.35, thickness,
+    -width / 2, length * 0.35, 0,
+    0, 0, 0,
+
+    // Front bottom right
+    0, length * 0.35, thickness,
+    0, 0, 0,
+    width / 2, length * 0.35, 0,
+
+    // Back top left
+    0, length, 0,
+    0, length * 0.35, -thickness,
+    -width / 2, length * 0.35, 0,
+
+    // Back top right
+    0, length, 0,
+    width / 2, length * 0.35, 0,
+    0, length * 0.35, -thickness,
+
+    // Back bottom left
+    0, length * 0.35, -thickness,
+    0, 0, 0,
+    -width / 2, length * 0.35, 0,
+
+    // Back bottom right
+    0, length * 0.35, -thickness,
+    width / 2, length * 0.35, 0,
+    0, 0, 0,
+  ]);
+
+  geom.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+  geom.computeVertexNormals();
+  return geom;
 }
+
+const HALF_LEAF_CONFIG = [
+  { angle: 0, scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0 },                 // Center (tallest)
+  { angle: 0.55, scaleX: 0.9, scaleY: 0.75, scaleZ: 0.8 },             // Left 1 (points up-left)
+  { angle: 1.1, scaleX: 0.8, scaleY: 0.5, scaleZ: 0.6 },               // Left 2 (points left)
+  { angle: 1.65, scaleX: 0.65, scaleY: 0.35, scaleZ: 0.45 },           // Left 3 (points down-left)
+  { angle: Math.PI, scaleX: 0.2, scaleY: 0.25, scaleZ: 0.3 }           // Bottom stem
+];
+
+const LEAF_COORDINATES = [0.22, 0.45, 0.72];
 
 function Leaf({ curve, t, reveal, side }) {
   const groupRef = useRef(null);
@@ -101,7 +104,7 @@ function Leaf({ curve, t, reveal, side }) {
 
   useFrame(() => {
     if (groupRef.current) {
-      groupRef.current.scale.setScalar(Math.max(0.0001, reveal));
+      groupRef.current.scale.setScalar(Math.max(0.0001, reveal) * 0.45);
     }
   });
 
@@ -123,96 +126,96 @@ function Leaf({ curve, t, reveal, side }) {
   );
 }
 
-function Bloom({ opennessRef, reducedMotion }) {
-  const petalCount = 6;
-  const coreRef = useRef(null);
-  const petalRefs = useRef([]);
+function Flower({ opennessRef, reducedMotion }) {
+  const bladeRefs = useRef([]);
+  const lightRef = useRef(null);
   const scaleRef = useRef(0.0001);
 
-  const petalGeometry = useMemo(() => {
-    const shape = createPetalShape();
-    return new THREE.ExtrudeGeometry(shape, {
-      depth: 0.015,
-      bevelEnabled: true,
-      bevelThickness: 0.006,
-      bevelSize: 0.006,
-      bevelSegments: 2,
-      curveSegments: 8,
-    });
-  }, []);
+  const baseBladeGeometry = useMemo(() => createFacetedBladeGeometry(0.75, 0.2, 0.05), []);
 
-  useEffect(() => () => petalGeometry.dispose(), [petalGeometry]);
+  useEffect(() => () => baseBladeGeometry.dispose(), [baseBladeGeometry]);
 
   useFrame((state) => {
     const openness = opennessRef.current;
-    scaleRef.current += (Math.max(openness, 0.0005) - scaleRef.current) * 0.08;
+    scaleRef.current += (Math.max(openness, 0.0001) - scaleRef.current) * 0.06;
 
-    if (coreRef.current) {
-      coreRef.current.scale.setScalar(scaleRef.current);
+    if (lightRef.current) {
+      lightRef.current.intensity = scaleRef.current * 4.0;
     }
 
-    const closedAngle = 0.3;
-    const openAngle = 1.35;
+    HALF_LEAF_CONFIG.forEach((config, index) => {
+      const mesh = bladeRefs.current[index];
+      if (!mesh) return;
 
-    petalRefs.current.forEach((petal, index) => {
-      if (!petal) {
-        return;
+      const baseScale = scaleRef.current;
+      mesh.scale.set(
+        baseScale * config.scaleX,
+        baseScale * config.scaleY,
+        baseScale * config.scaleZ
+      );
+
+      if (index === 4) { // Bottom stem
+        mesh.rotation.z = Math.PI;
+      } else {
+        const wobble = reducedMotion ? 0 : Math.sin(state.clock.getElapsedTime() * 0.5 + index) * 0.02;
+        mesh.rotation.z = (config.angle * openness) + wobble;
       }
-
-      const wobble = reducedMotion ? 0 : Math.sin(state.clock.getElapsedTime() * 0.6 + index) * 0.02;
-      petal.rotation.x = -(closedAngle + (openAngle - closedAngle) * openness + wobble);
-      petal.scale.setScalar(scaleRef.current);
     });
   });
 
   return (
-    <group>
-      <mesh ref={coreRef} castShadow scale={0.0001}>
-        <sphereGeometry args={[0.06, 16, 16]} />
-        <meshPhysicalMaterial color="#f6e4b0" metalness={1} roughness={0.16} envMapIntensity={1.6} />
-      </mesh>
+    <group position={[0, 0, 0]}>
+      <pointLight
+        ref={lightRef}
+        position={[0, 0.4, 0.5]}
+        color="#ffe88d"
+        intensity={0}
+        distance={4.0}
+        decay={1.5}
+        castShadow
+      />
 
-      {Array.from({ length: petalCount }, (_, index) => {
-        const angle = (index / petalCount) * Math.PI * 2;
-        return (
-          <group key={index} rotation={[0, angle, 0]}>
-            <group
-              ref={(element) => {
-                petalRefs.current[index] = element;
-              }}
-              position={[0, 0.02, 0.06]}
-              scale={0.0001}
-            >
-              <mesh geometry={petalGeometry} castShadow>
-                <meshPhysicalMaterial
-                  color="#f3e2b8"
-                  metalness={0.4}
-                  roughness={0.18}
-                  clearcoat={0.8}
-                  transmission={0.12}
-                  thickness={0.3}
-                  envMapIntensity={1.5}
-                />
-              </mesh>
-            </group>
-          </group>
-        );
-      })}
+      {HALF_LEAF_CONFIG.map((config, index) => (
+        <mesh
+          key={index}
+          ref={(element) => {
+            bladeRefs.current[index] = element;
+          }}
+          geometry={baseBladeGeometry}
+          castShadow
+          scale={0.0001}
+        >
+          <meshPhysicalMaterial
+            color="#d4af37"
+            metalness={1.0}
+            roughness={0.12}
+            clearcoat={1.0}
+            clearcoatRoughness={0.03}
+            envMapIntensity={2.0}
+          />
+        </mesh>
+      ))}
     </group>
   );
 }
 
-function Stem({ stem, stage, waterPulse, reducedMotion }) {
+function GrowingStem({ stage, waterPulse, reducedMotion, onGrowthUpdate }) {
   const meshRef = useRef(null);
   const growthRef = useRef(0.0001);
-  const bloomOpennessRef = useRef(0);
   const pulseStartRef = useRef(-Infinity);
   const [smoothT, setSmoothT] = useState(0.0001);
 
-  const baseCurve = useMemo(
-    () => new THREE.CatmullRomCurve3(stem.points.map((point) => new THREE.Vector3(...point))),
-    [stem.points],
-  );
+  // The stem curves up gracefully
+  const stemPoints = useMemo(() => [
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(0.1, 0.4, 0.05),
+    new THREE.Vector3(-0.05, 0.9, -0.05),
+    new THREE.Vector3(0, 1.4, 0)
+  ], []);
+
+  const baseCurve = useMemo(() => new THREE.CatmullRomCurve3(stemPoints), [stemPoints]);
+
+  const growthVelocityRef = useRef(0);
 
   useEffect(() => {
     if (waterPulse) {
@@ -221,16 +224,23 @@ function Stem({ stem, stage, waterPulse, reducedMotion }) {
   }, [waterPulse]);
 
   useFrame(() => {
-    const target = targetGrowth(stage, stem);
-    growthRef.current += (target - growthRef.current) * 0.05;
+    const target = targetGrowth(stage);
 
-    const rounded = Math.round(growthRef.current * 80) / 80;
-    if (Math.abs(rounded - smoothT) > 0.0001) {
-      setSmoothT(rounded);
+    if (reducedMotion) {
+      growthRef.current += (target - growthRef.current) * 0.08;
+    } else {
+      // 2nd-order spring-damper physics solver for organic elastic sprout
+      const growthForce = (target - growthRef.current) * 0.05;
+      growthVelocityRef.current += growthForce;
+      growthVelocityRef.current *= 0.83; // Friction dampening
+      growthRef.current += growthVelocityRef.current;
     }
 
-    const bloomTarget = targetBloom(stage, stem);
-    bloomOpennessRef.current += (bloomTarget - bloomOpennessRef.current) * 0.04;
+    const rounded = Math.round(growthRef.current * 100) / 100;
+    if (Math.abs(rounded - smoothT) > 0.0001) {
+      setSmoothT(rounded);
+      onGrowthUpdate(rounded, baseCurve);
+    }
 
     if (meshRef.current) {
       const pulseDuration = reducedMotion ? 0.6 : 1.8;
@@ -239,35 +249,28 @@ function Stem({ stem, stage, waterPulse, reducedMotion }) {
 
       if (elapsed >= 0 && elapsed < pulseDuration) {
         const wave = Math.max(0, Math.sin((elapsed / pulseDuration) * Math.PI));
-        material.emissiveIntensity = 0.1 + wave * 1.2;
+        material.emissiveIntensity = 0.1 + wave * 1.5;
       } else {
         material.emissiveIntensity = 0.08;
-      }
-
-      if (!reducedMotion) {
-        const t = performance.now() / 1000;
-        meshRef.current.rotation.z = Math.sin(t * 0.4 + stem.startStage) * 0.015;
       }
     }
   });
 
   const geometry = useMemo(() => {
-    if (smoothT <= 0.01) {
-      return null;
-    }
+    if (smoothT <= 0.02) return null;
 
-    const sampleCount = 48;
+    const sampleCount = 64;
     const grownSamples = Math.max(2, Math.round(sampleCount * smoothT));
     const points = baseCurve.getPoints(sampleCount).slice(0, grownSamples);
     const subCurve = new THREE.CatmullRomCurve3(points.length > 1 ? points : [points[0], points[0].clone().add(new THREE.Vector3(0, 0.01, 0))]);
 
     return createTaperedTubeGeometry(subCurve, {
-      radiusStart: stem.radiusStart,
-      radiusEnd: THREE.MathUtils.lerp(stem.radiusStart, stem.radiusEnd, smoothT),
-      tubularSegments: Math.max(4, Math.round(28 * smoothT)),
-      radialSegments: 7,
+      radiusStart: 0.05,
+      radiusEnd: 0.015,
+      tubularSegments: Math.max(8, Math.round(48 * smoothT)),
+      radialSegments: 8,
     });
-  }, [baseCurve, smoothT, stem]);
+  }, [baseCurve, smoothT]);
 
   useEffect(() => () => geometry?.dispose(), [geometry]);
 
@@ -280,35 +283,66 @@ function Stem({ stem, stage, waterPulse, reducedMotion }) {
             emissive="#f6e4b0"
             emissiveIntensity={0.08}
             metalness={1}
-            roughness={0.22}
-            clearcoat={0.5}
-            envMapIntensity={1.4}
+            roughness={0.2}
+            clearcoat={0.6}
+            envMapIntensity={1.5}
           />
         </mesh>
       ) : null}
 
-      {stem.leafAt?.map((t, index) => {
+      {LEAF_COORDINATES.map((t, index) => {
         const reveal = THREE.MathUtils.clamp((smoothT - t + 0.18) / 0.18, 0, 1);
         return reveal > 0.01 ? (
           <Leaf key={index} curve={baseCurve} t={t} reveal={reveal} side={index % 2 === 0 ? 1 : -1} />
         ) : null;
       })}
-
-      {stem.hasBloom ? (
-        <group position={baseCurve.getPointAt(0.999)}>
-          <Bloom opennessRef={bloomOpennessRef} reducedMotion={reducedMotion} />
-        </group>
-      ) : null}
     </group>
   );
 }
 
 export function GoldenBloom({ stage, waterPulse = 0, reducedMotion = false }) {
+  const groupRef = useRef(null);
+  const bloomOpennessRef = useRef(0);
+  const bloomVelocityRef = useRef(0);
+  const [flowerPos, setFlowerPos] = useState([0, 0, 0]);
+
+  useFrame((state) => {
+    if (!groupRef.current) return;
+
+    // The plant dynamically centers and bounds itself beautifully based on stage
+    const t = state.clock.getElapsedTime();
+    if (!reducedMotion) {
+      groupRef.current.position.y = Math.sin(t * 0.5) * 0.03;
+      groupRef.current.rotation.y = Math.sin(t * 0.2) * 0.05;
+    }
+
+    const targetBloomVal = targetBloom(stage);
+    
+    if (reducedMotion) {
+      bloomOpennessRef.current += (targetBloomVal - bloomOpennessRef.current) * 0.05;
+    } else {
+      // 2nd-order spring-damper physics solver for flower fanning out with organic elastic bounce
+      const force = (targetBloomVal - bloomOpennessRef.current) * 0.04;
+      bloomVelocityRef.current += force;
+      bloomVelocityRef.current *= 0.82; // Friction dampening
+      bloomOpennessRef.current += bloomVelocityRef.current;
+    }
+  });
+
+  const handleGrowthUpdate = (smoothT, curve) => {
+    // Keep flower at the very tip of the stem
+    const tip = curve.getPointAt(Math.min(0.999, smoothT));
+    setFlowerPos([tip.x, tip.y, tip.z]);
+  };
+
   return (
-    <group>
-      {STEMS.map((stem) => (
-        <Stem key={stem.id} stem={stem} stage={stage} waterPulse={waterPulse} reducedMotion={reducedMotion} />
-      ))}
+    <group ref={groupRef}>
+      <GrowingStem stage={stage} waterPulse={waterPulse} reducedMotion={reducedMotion} onGrowthUpdate={handleGrowthUpdate} />
+      <group position={flowerPos}>
+        {stage >= 5 && (
+          <Flower opennessRef={bloomOpennessRef} reducedMotion={reducedMotion} />
+        )}
+      </group>
     </group>
   );
 }

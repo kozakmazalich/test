@@ -16,7 +16,7 @@ export function GardenPlant({ stage, reducedMotion = false }) {
       <Canvas
         shadows
         dpr={[1, 2]}
-        camera={{ position: [0.5, 0.3, 4.8], fov: 32 }}
+        camera={{ position: [0, 0.5, 5.8], fov: 38 }}
         gl={{ alpha: true, antialias: true }}
       >
         <StudioEnvironment />

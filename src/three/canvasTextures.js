@@ -1,25 +1,8 @@
 import { CanvasTexture, SRGBColorSpace } from 'three';
 
-/**
- * These helpers draw textures on an offscreen 2D canvas and hand the
- * result to Three.js as a `CanvasTexture` — a normal, supported way to
- * get artwork onto a 3D surface without loading an external image file
- * or making any network request.
- *
- * IMPORTANT / HONEST LIMITATION: the "emblem" drawn below is an
- * original in-app reproduction of the reference golden-weed artwork
- * (same five-blade fan geometry used by the 3D plant), not a decoded
- * copy of the attached chat image. This app has no mechanism to save a
- * pasted chat attachment as a binary asset file, so a pixel-exact
- * texture isn't possible from inside this tool. For pixel-exact
- * fidelity, drop the real file at `src/assets/weed-emblem.png` and
- * swap `createEmblemTexture()` below for a `TextureLoader` load of
- * that file — one line change, called out in the project README.
- */
-
-const BLADE_ANGLES = [6, -30, -54, -78, 158];
-const BLADE_LENGTHS = [0.92, 0.74, 0.56, 0.4, 0.24];
-const BLADE_WIDTHS = [0.05, 0.16, 0.14, 0.11, 0.045];
+const BLADE_ANGLES = [0, -38, -76, -114, 38, 76, 114, 180];
+const BLADE_LENGTHS = [0.95, 0.82, 0.65, 0.45, 0.82, 0.65, 0.45, 0.35];
+const BLADE_WIDTHS = [0.18, 0.16, 0.14, 0.11, 0.16, 0.14, 0.11, 0.08];
 
 function drawBlade(ctx, angleDeg, length, width, size) {
   const angle = (angleDeg * Math.PI) / 180;
@@ -30,6 +13,7 @@ function drawBlade(ctx, angleDeg, length, width, size) {
   const shoulderY = tipY * 0.6;
   const halfWidth = (width * size) / 2;
 
+  // Left half of the blade
   const lightGradient = ctx.createLinearGradient(-halfWidth, shoulderY, 0, tipY);
   lightGradient.addColorStop(0, '#8a6425');
   lightGradient.addColorStop(0.55, '#e8cf9a');
@@ -42,6 +26,7 @@ function drawBlade(ctx, angleDeg, length, width, size) {
   ctx.closePath();
   ctx.fill();
 
+  // Right half of the blade
   const darkGradient = ctx.createLinearGradient(0, shoulderY, halfWidth, 0);
   darkGradient.addColorStop(0, '#f6e4b0');
   darkGradient.addColorStop(0.5, '#a9812f');
@@ -54,8 +39,8 @@ function drawBlade(ctx, angleDeg, length, width, size) {
   ctx.closePath();
   ctx.fill();
 
-  ctx.strokeStyle = 'rgba(255, 248, 224, 0.55)';
-  ctx.lineWidth = Math.max(1, size * 0.006);
+  ctx.strokeStyle = 'rgba(255, 248, 224, 0.3)';
+  ctx.lineWidth = Math.max(1, size * 0.004);
   ctx.beginPath();
   ctx.moveTo(0, 0);
   ctx.lineTo(0, tipY);
@@ -75,9 +60,10 @@ export function createEmblemTexture() {
   ctx.fillRect(0, 0, size, size);
 
   ctx.save();
-  ctx.translate(size * 0.52, size * 0.62);
+  // Center it properly
+  ctx.translate(size * 0.5, size * 0.55);
   BLADE_ANGLES.forEach((angle, index) => {
-    drawBlade(ctx, angle, BLADE_LENGTHS[index], BLADE_WIDTHS[index], size * 0.66);
+    drawBlade(ctx, angle, BLADE_LENGTHS[index], BLADE_WIDTHS[index], size * 0.45);
   });
   ctx.restore();
 
@@ -112,5 +98,3 @@ export function createReverseTexture() {
   texture.needsUpdate = true;
   return texture;
 }
-
-

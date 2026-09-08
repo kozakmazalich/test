@@ -34,10 +34,6 @@ export function PotMesh() {
           envMapIntensity={1.1}
         />
       </mesh>
-      <mesh position={[0, 1.02, 0]}>
-        <torusGeometry args={[0.63, 0.03, 12, 48]} />
-        <meshPhysicalMaterial color="#cfa356" metalness={1} roughness={0.25} envMapIntensity={1.5} />
-      </mesh>
     </group>
   );
 }
