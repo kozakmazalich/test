@@ -20,6 +20,8 @@ export function WateringOverlay({ onComplete, reducedMotion, fromStage = 0, toSt
 
   return (
     <div className="watering-overlay" role="status" aria-live="polite">
+      <div className="watering-sweep" aria-hidden="true" />
+
       <button type="button" className="overlay-skip" onClick={onComplete}>
         Skip
       </button>
@@ -37,7 +39,8 @@ export function WateringOverlay({ onComplete, reducedMotion, fromStage = 0, toSt
 
       {phase === 'result' ? (
         <div className="watering-result">
-          <p className="result-title">GARDEN WATERED</p>
+          <p className="result-title">The garden remembers.</p>
+          <p className="result-caption">Growth stage {String(toStage).padStart(2, '0')} received</p>
           <button type="button" className="primary-button" onClick={onComplete}>
             Continue
           </button>

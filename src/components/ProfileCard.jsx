@@ -1,14 +1,21 @@
+import { useEffect, useState } from 'react';
 import { GardenAvatar } from './GardenAvatar.jsx';
 import { WEEK_LENGTH } from '../garden/garden-logic.js';
+import { CheckIcon, CopyIcon } from './icons.jsx';
 
 function shortAddress(address) {
   if (!address) {
     return '—';
   }
 
-  return `${address.slice(0, 4)}...${address.slice(-4)}`;
+  return `${address.slice(0, 4)}…${address.slice(-4)}`;
 }
 
+/**
+ * Member dialog. Opens from the MEMBER control in the top-right corner:
+ * a holographic avatar card (the real 3D avatar in a gold gradient frame)
+ * above the profile rows, with wallet copy, Escape/outside-click close.
+ */
 export function ProfileCard({
   walletAddress,
   traits,
@@ -20,45 +27,91 @@ export function ProfileCard({
   coinBalance,
   onClose,
 }) {
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [onClose]);
+
+  const handleCopy = () => {
+    if (!walletAddress) {
+      return;
+    }
+
+    navigator.clipboard?.writeText(walletAddress).catch(() => {});
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1500);
+  };
+
+  const rows = [
+    ['Garden', gardenNumber],
+    ['Current streak', `${currentStreak} days`],
+    ['Longest streak', `${longestStreak} days`],
+    ['This week', `${currentDay} / ${WEEK_LENGTH}`],
+    ['Completed weeks', String(completedWeeks)],
+  ];
+
   return (
-    <aside className="profile-card" role="dialog" aria-label="Member profile" aria-modal="true">
-      <button type="button" className="profile-close" onClick={onClose} aria-label="Close profile">
-        ×
-      </button>
+    <div className="profile-backdrop" onClick={onClose} role="presentation">
+      <aside
+        className="profile-card"
+        role="dialog"
+        aria-label="Member profile"
+        aria-modal="true"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <button type="button" className="profile-close" onClick={onClose} aria-label="Close profile">
+          ×
+        </button>
 
-      <p className="profile-kicker">MEMBER</p>
-      <GardenAvatar traits={traits} size="small" />
+        <h2 className="profile-title">Member</h2>
+        <p className="profile-kicker">The keeper of {gardenNumber}</p>
 
-      <dl className="profile-details">
-        <div>
-          <dt>WALLET</dt>
-          <dd>{shortAddress(walletAddress)}</dd>
+        <div className="profile-avatar-card" aria-label="Member identity card">
+          <div className="profile-avatar-card-inner">
+            <GardenAvatar traits={traits} size="small" />
+            <div className="avatar-card-holo" aria-hidden="true" />
+            <div className="avatar-card-label avatar-card-label-top" aria-hidden="true">
+              <span>Auric</span>
+              <span>★ VII</span>
+            </div>
+            <div className="avatar-card-label avatar-card-label-bottom" aria-hidden="true">
+              <span>Keeper · Holo</span>
+              <span>{gardenNumber}</span>
+            </div>
+          </div>
         </div>
-        <div>
-          <dt>GARDEN</dt>
-          <dd>GOLDEN GARDEN {gardenNumber}</dd>
+
+        <dl className="profile-rows">
+          <div className="profile-row">
+            <dt>Wallet</dt>
+            <dd>
+              <button type="button" className="profile-copy" onClick={handleCopy}>
+                {shortAddress(walletAddress)}
+                {copied ? <CheckIcon /> : <CopyIcon />}
+              </button>
+            </dd>
+          </div>
+          {rows.map(([label, value]) => (
+            <div key={label} className="profile-row">
+              <dt>{label}</dt>
+              <dd>{value}</dd>
+            </div>
+          ))}
+        </dl>
+
+        <div className="profile-balance">
+          <p className="profile-balance-label">Coin balance</p>
+          <p className="profile-balance-value">{coinBalance}</p>
         </div>
-        <div>
-          <dt>CURRENT STREAK</dt>
-          <dd>{currentStreak} DAYS</dd>
-        </div>
-        <div>
-          <dt>LONGEST STREAK</dt>
-          <dd>{longestStreak} DAYS</dd>
-        </div>
-        <div>
-          <dt>THIS WEEK</dt>
-          <dd>{currentDay} / {WEEK_LENGTH}</dd>
-        </div>
-        <div>
-          <dt>COMPLETED WEEKS</dt>
-          <dd>{completedWeeks}</dd>
-        </div>
-        <div>
-          <dt>COINS</dt>
-          <dd>{coinBalance}</dd>
-        </div>
-      </dl>
-    </aside>
+      </aside>
+    </div>
   );
 }

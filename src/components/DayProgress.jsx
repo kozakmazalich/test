@@ -10,15 +10,12 @@ export function DayProgress({ currentDay }) {
         const isCurrent = day === currentDay + 1 && currentDay < WEEK_LENGTH;
 
         return (
-          <div
+          <span
             key={day}
             role="listitem"
             className={`day-mark${completed ? ' is-complete' : ''}${isCurrent ? ' is-current' : ''}`}
             aria-label={`Day ${day}${completed ? ', completed' : isCurrent ? ', current' : ''}`}
-          >
-            <span className="day-mark-shape" aria-hidden="true" />
-            <span className="day-mark-label">{String(day).padStart(2, '0')}</span>
-          </div>
+          />
         );
       })}
     </div>

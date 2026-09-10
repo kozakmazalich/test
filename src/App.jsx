@@ -21,6 +21,13 @@ import { DayProgress } from './components/DayProgress.jsx';
 import { WateringOverlay } from './components/WateringOverlay.jsx';
 import { RewardSequence } from './components/RewardSequence.jsx';
 import { ProfileCard } from './components/ProfileCard.jsx';
+import {
+  DropletsIcon,
+  UserRoundIcon,
+  VolumeOffIcon,
+  VolumeOnIcon,
+  WindIcon,
+} from './components/icons.jsx';
 
 const PREFS_KEY = 'noviciado-garden-prefs';
 
@@ -92,6 +99,31 @@ function usePrefersReducedMotion() {
 
 function pad2(value) {
   return String(value).padStart(2, '0');
+}
+
+const DUST_MOTES = Array.from({ length: 18 }, (_, index) => index);
+
+function Dust({ reducedMotion }) {
+  if (reducedMotion) {
+    return null;
+  }
+
+  return (
+    <div className="dust-field" aria-hidden="true">
+      {DUST_MOTES.map((index) => (
+        <i
+          key={index}
+          className="dust-mote"
+          style={{
+            left: `${(index * 37) % 96}%`,
+            top: `${35 + ((index * 29) % 60)}%`,
+            animationDuration: `${7 + (index % 5)}s`,
+            animationDelay: `${index * 0.43}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
 }
 
 export function App() {
@@ -234,10 +266,12 @@ export function App() {
 
   return (
     <main className="app" data-reduced-motion={reducedMotion}>
+      <Dust reducedMotion={reducedMotion} />
+
       <header className="app-header">
         <div>
-          <p className="brand-kicker">NOVICIADO</p>
-          <p className="brand-title">THE GARDEN</p>
+          <p className="brand-kicker">Noviciado</p>
+          <p className="brand-title">The Garden</p>
         </div>
 
         <div className="header-controls">
@@ -246,19 +280,29 @@ export function App() {
             className="icon-toggle"
             onClick={() => setSoundOn((value) => !value)}
             aria-pressed={soundOn}
+            aria-label={soundOn ? 'Turn sound off' : 'Turn sound on'}
           >
-            {soundOn ? 'SOUND ON' : 'SOUND OFF'}
+            {soundOn ? <VolumeOnIcon /> : <VolumeOffIcon />}
+            <span className="icon-toggle-label">Sound</span>
           </button>
           <button
             type="button"
             className="icon-toggle"
             onClick={() => setReducedMotionOverride((value) => !value)}
             aria-pressed={reducedMotionOverride}
+            aria-label="Toggle reduced motion"
           >
-            {reducedMotionOverride ? 'MOTION REDUCED' : 'REDUCE MOTION'}
+            <WindIcon />
+            <span className="icon-toggle-label">Motion</span>
           </button>
-          <button type="button" className="icon-toggle" onClick={() => setShowProfile(true)}>
-            MEMBER
+          <button
+            type="button"
+            className="icon-toggle"
+            onClick={() => setShowProfile(true)}
+            aria-label="Open member profile"
+          >
+            <UserRoundIcon />
+            <span className="icon-toggle-label">Member</span>
           </button>
         </div>
       </header>
@@ -272,37 +316,43 @@ export function App() {
             currentDay={gardenState.currentDay}
             totalDays={WEEK_LENGTH}
           />
+          <p className="stage-label">Identity · Auric</p>
         </div>
 
         <div className="garden-column plant-column">
           <GardenPlant stage={gardenState.currentDay} reducedMotion={reducedMotion} />
+          <p className="stage-label">Growth · {gardenState.currentDay}/7</p>
         </div>
       </section>
 
       <section className="ritual-panel">
-        <p className="ritual-day-label">DAY {pad2(displayDay)} / {pad2(WEEK_LENGTH)}</p>
+        <p className="ritual-day-label">
+          Day <span className="day-number">{pad2(displayDay)}</span> / {pad2(WEEK_LENGTH)}
+        </p>
         <p className="ritual-status" aria-live="polite">{statusMessage}</p>
 
         {canWater ? (
           <button type="button" className="primary-button ritual-cta" onClick={handleWaterClick}>
-            WATER THE GARDEN
+            <DropletsIcon />
+            Water the garden
           </button>
         ) : (
-          <div className="ritual-cooldown">
-            <p className="ritual-cooldown-title">GARDEN WATERED</p>
-            {!gardenState.rewardPending ? (
-              <>
-                <p className="ritual-cooldown-caption">NEXT RITUAL IN</p>
-                <p className="ritual-cooldown-timer">{cooldownLabel}</p>
-              </>
-            ) : null}
+          <div className="ritual-cooldown" aria-live="polite">
+            <p className="ritual-cooldown-title">
+              Garden watered
+              {!gardenState.rewardPending ? (
+                <>
+                  {' '}· Next ritual in <span className="ritual-cooldown-timer">{cooldownLabel}</span>
+                </>
+              ) : null}
+            </p>
           </div>
         )}
 
         <DayProgress currentDay={gardenState.currentDay} />
 
         {daysUntilReward > 0 && gardenState.currentDay > 0 ? (
-          <p className="ritual-countdown-label">{daysUntilReward} DAYS UNTIL REWARD</p>
+          <p className="ritual-countdown-label">{daysUntilReward} days until reward</p>
         ) : null}
 
         {isDevMode ? (
@@ -325,6 +375,8 @@ export function App() {
         <RewardSequence
           onClose={handleRewardClose}
           balance={gardenState.coinBalance + 10}
+          streak={gardenState.currentStreak}
+          week={gardenState.completedWeeks + 1}
           soundOn={soundOn}
           reducedMotion={reducedMotion}
         />

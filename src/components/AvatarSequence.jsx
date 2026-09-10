@@ -24,14 +24,14 @@ export function AvatarSequence({ traits, gardenNumber, onEnter, soundOn, reduced
   return (
     <section className="avatar-sequence">
       <p className="sequence-kicker">
-        {phase === 'assembling' ? 'GENERATING YOUR IDENTITY…' : 'IDENTITY CREATED'}
+        {phase === 'assembling' ? 'Cultivating identity…' : 'Identity created'}
       </p>
 
       <div className={`assembly-stage phase-${phase}`}>
         {phase === 'assembling' ? (
           <div className="assembly-fragments" aria-hidden="true">
             {Array.from({ length: 6 }, (_, index) => (
-              <span key={index} className="fragment" style={{ animationDelay: `${index * 0.12}s` }} />
+              <span key={index} className="fragment" style={{ animationDelay: `${index * 0.16}s` }} />
             ))}
           </div>
         ) : (
@@ -39,12 +39,16 @@ export function AvatarSequence({ traits, gardenNumber, onEnter, soundOn, reduced
         )}
       </div>
 
+      <p className="sequence-garden">Garden {gardenNumber}</p>
+      <div className="sequence-progress" aria-hidden="true">
+        <span />
+      </div>
+
       {phase === 'ready' ? (
         <div className="sequence-ready">
-          <p className="sequence-garden">GOLDEN GARDEN {gardenNumber}</p>
-          <p className="sequence-subtitle">YOUR GARDEN AWAITS</p>
+          <p className="sequence-subtitle">Your garden awaits</p>
           <button type="button" className="primary-button" onClick={onEnter}>
-            ENTER
+            Enter
           </button>
         </div>
       ) : null}
